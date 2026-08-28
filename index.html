@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>QR Smart Form</title>
+<meta name="description" content="Scan, fill, and submit bank service requests from your phone." />
+<meta name="theme-color" content="#0B3358" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="QR Smart Form" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" style="display:none;" aria-label="Go back">&#8592;</button>
+    <div class="seal" id="topSeal">QR</div>
+    <div class="titles">
+      <h1>QR Smart Form</h1>
+      <div class="crumb" id="crumbText">Home</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="install-banner" id="installBanner">
+      <div class="txt">Install this app on your phone for one-tap access, even offline.</div>
+      <button id="installBtn" type="button">Install</button>
+    </div>
+
+    <!-- HOME VIEW -->
+    <section class="view active" id="view-home">
+      <div class="home-hero">
+        <div class="seal-lg">QR</div>
+        <h2>QR Smart Form</h2>
+        <p>Select a service below to get started.</p>
+      </div>
+
+      <p class="service-label">Available services</p>
+
+      <button class="service-card" id="goAccountStatement" type="button">
+        <div class="icon">&#128196;</div>
+        <div class="text">
+          <strong>Account Statement Request</strong>
+          <span>Request a statement for any period</span>
+        </div>
+      </button>
+
+      <div class="service-card disabled">
+        <div class="icon">&#128179;</div>
+        <div class="text"><strong>Cheque Book Request</strong><span>Coming soon</span></div>
+      </div>
+      <div class="service-card disabled">
+        <div class="icon">&#128179;</div>
+        <div class="text"><strong>Debit Card Request</strong><span>Coming soon</span></div>
+      </div>
+      <div class="service-card disabled">
+        <div class="icon">&#127968;</div>
+        <div class="text"><strong>Address Update</strong><span>Coming soon</span></div>
+      </div>
+
+      <button class="btn btn-secondary" id="goAdmin" type="button" style="margin-top:22px;">Admin: generate service QR code</button>
+    </section>
+
+    <!-- ACCOUNT STATEMENT FORM VIEW -->
+    <section class="view" id="view-form">
+      <h2 class="form-title">Account Statement Request</h2>
+      <p class="form-sub">Fill in your details below. Fields marked required must be completed.</p>
+
+      <form id="statementForm" novalidate>
+        <div class="field" id="field-name">
+          <label for="custName">Customer name <span style="color:var(--error)">*</span></label>
+          <input type="text" id="custName" autocomplete="name" placeholder="Full name as per bank records" />
+          <div class="error">Enter your full name.</div>
+        </div>
+
+        <div class="field" id="field-mobile">
+          <label for="custMobile">Mobile number <span style="color:var(--error)">*</span></label>
+          <input type="tel" id="custMobile" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" />
+          <div class="hint">Enter a valid 10-digit Indian mobile number.</div>
+          <div class="error">Enter a valid 10-digit mobile number.</div>
+        </div>
+
+        <div class="field" id="field-account">
+          <label for="custAccount">Account number <span style="color:var(--error)">*</span></label>
+          <input type="text" id="custAccount" inputmode="numeric" maxlength="16" placeholder="16-digit account number" />
+          <div class="error">Account number must be exactly 16 digits.</div>
+        </div>
+
+        <div class="date-row">
+          <div class="field" id="field-start">
+            <label for="startDate">Start date <span style="color:var(--error)">*</span></label>
+            <input type="date" id="startDate" />
+            <div class="error">Choose a start date.</div>
+          </div>
+          <div class="field" id="field-end">
+            <label for="endDate">End date <span style="color:var(--error)">*</span></label>
+            <input type="date" id="endDate" />
+            <div class="error">Choose an end date.</div>
+          </div>
+        </div>
+
+        <div class="period-error" id="periodError"></div>
+
+        <button type="submit" class="btn btn-primary">Generate Statement Request</button>
+      </form>
+    </section>
+
+    <!-- GENERATED DOCUMENT VIEW -->
+    <section class="view" id="view-doc">
+      <h2 class="form-title">Request generated</h2>
+      <p class="form-sub">Review the details below, then download or print your request.</p>
+
+      <div class="doc-sheet" id="docSheet">
+        <div class="doc-header">
+          <div class="bank-name">Account Statement Request</div>
+          <h3>ACCOUNT STATEMENT REQUEST</h3>
+        </div>
+        <div class="doc-row"><span class="k">Customer name</span><span class="v" id="docName"></span></div>
+        <div class="doc-row"><span class="k">Mobile number</span><span class="v" id="docMobile"></span></div>
+        <div class="doc-row"><span class="k">Account number</span><span class="v" id="docAccount"></span></div>
+        <div class="doc-row"><span class="k">Statement period</span><span class="v" id="docPeriod"></span></div>
+        <p class="doc-request">"I request you to provide my account statement for the above-mentioned period."</p>
+        <div class="doc-footer">
+          <div>Date: <span id="docDate"></span></div>
+          <div class="sig-line">Customer signature</div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-primary" id="downloadPdfBtn" type="button">Download PDF</button>
+        <button class="btn btn-secondary" id="printBtn" type="button" style="margin-top:0;">Print</button>
+      </div>
+      <button class="btn btn-secondary" id="newRequestBtn" type="button">Create new request</button>
+    </section>
+
+    <!-- ADMIN / QR VIEW -->
+    <section class="view" id="view-admin">
+      <h2 class="form-title">Generate service QR code</h2>
+      <p class="form-sub">This QR code links customers straight to the Account Statement Request form. It does not contain any customer data.</p>
+
+      <div class="qr-box">
+        <div id="qrcode"></div>
+        <div class="qr-url" id="qrUrlText"></div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-primary" id="downloadQrBtn" type="button">Download QR as PNG</button>
+        <button class="btn btn-secondary" id="printQrBtn" type="button" style="margin-top:0;">Print QR</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
